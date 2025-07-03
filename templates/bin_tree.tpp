@@ -2,6 +2,7 @@
 #include <string>
 #include <queue>
 #include <stack>
+#include <stdexcept>
 #include "../headers/bin_tree.hpp"
 
 template <typename T>
@@ -177,6 +178,135 @@ void bin_tree<T>::bin_iterator::build_pre_order(node *point)
 }
 
 template <typename T>
-bin_tree<T>::bin_iterator::bin_iterator(node *root, std::string order)
+void bin_tree<T>::bin_iterator::build_post_order(node *point)
 {
+    if (!point)
+    {
+        return;
+    }
+    std::stack<node *> st;
+    node *current = point;
+    node *last = nullptr;
+    while (current || !st.empty())
+    {
+        if (current)
+        {
+            st.push(current);
+            current = current->left;
+        }
+        else
+        {
+            node *peek = st.top();
+            if (peek->right && last != peek->right)
+            {
+                current = peek->right;
+            }
+            else
+            {
+                nodes.push_back(peek);
+                last = peek;
+                st.pop();
+            }
+        }
+    }
+}
+
+template <typename T>
+bin_tree<T>::bin_iterator::bin_iterator(node *root, std::string order) : recent(0)
+{
+    if (root)
+    {
+        if (order == "in_order")
+        {
+            build_in_order(root);
+        }
+        else if (order == "pre_order")
+        {
+            build_pre_order(root);
+        }
+        else if (order == "post_order")
+        {
+            build_post_order(root);
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid order");
+        }
+    }
+}
+
+template <typename T>
+T &bin_tree<T>::bin_iterator::operator*()
+{
+    if (nodes.empty() || recent >= nodes.size())
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    return nodes[recent]->get_data();
+}
+
+template <typename T>
+typename bin_tree<T>::bin_iterator &bin_tree<T>::bin_iterator::operator++()
+{
+    if (nodes.empty() || recent >= nodes.size())
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    recent++;
+    return *this;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_iterator bin_tree<T>::bin_iterator::operator++(int)
+{
+    if (nodes.empty() || recent >= nodes.size())
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    bin_iterator temp = *this;
+    recent++;
+    return temp;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_iterator &bin_tree<T>::bin_iterator::operator--()
+{
+    if (nodes.empty() || recent <= 0)
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    recent--;
+    return *this;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_iterator bin_tree<T>::bin_iterator::operator--(int)
+{
+    if (nodes.empty() || recent <= 0)
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    bin_iterator temp = *this;
+    recent--;
+    return temp;
+}
+
+template <typename T>
+bool bin_tree<T>::bin_iterator::operator==(const bin_iterator &other) const
+{
+    return recent == other.recent;
+}
+
+template <typename T>
+bool bin_tree<T>::bin_iterator::operator!=(const bin_iterator &other) const
+{
+    if (nodes.empty() || other.nodes.empty())
+    {
+        return true;
+    }
+    if (nodes.empty() && other.nodes.empty())
+    {
+        return false;
+    }
+    return recent != other.recent;
 }

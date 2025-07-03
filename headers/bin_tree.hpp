@@ -40,7 +40,7 @@ public:
     private:
         node *current;
         std::vector<node *> nodes;
-        int level;
+        int recent;
 
         void build_in_order(node *point);
         void build_pre_order(node *point);
@@ -61,7 +61,7 @@ public:
     private:
         node *current;
         std::vector<node *> nodes;
-        int level;
+        int recent;
 
     public:
         const_bin_iterator(node *root, std::string order = "in_order");
