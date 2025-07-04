@@ -19,6 +19,7 @@ private:
         node *get_parent();
         node *get_left();
         node *get_right();
+        node *clone(node *point);
         T &get_data() const;
         int get_height();
         void set_left(node *left);
@@ -38,7 +39,6 @@ public:
     class bin_iterator
     {
     private:
-        node *current;
         std::vector<node *> nodes;
         int recent;
 
@@ -59,12 +59,15 @@ public:
     class const_bin_iterator
     {
     private:
-        node *current;
-        std::vector<node *> nodes;
+        std::vector<const node *> nodes;
         int recent;
 
+        void build_in_order(const node *point);
+        void build_pre_order(const node *point);
+        void build_post_order(const node *point);
+
     public:
-        const_bin_iterator(node *root, std::string order = "in_order");
+        const_bin_iterator(const node *root, std::string order = "in_order");
         const T &operator*() const;
         const_bin_iterator &operator++();
         const_bin_iterator operator++(int);
@@ -78,7 +81,7 @@ public:
     const_bin_iterator cbegin(std::string order = "in_order") const;
     const_bin_iterator cend(std::string order = "in_order") const;
     bin_tree();
-    bin_tree(const bin_iterator &other);
+    bin_tree(const bin_tree &other);
     ~bin_tree();
     node *get_root() const;
     node *find(const T &value);

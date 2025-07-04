@@ -60,6 +60,20 @@ typename bin_tree<T>::node *bin_tree<T>::node::get_right()
 }
 
 template <typename T>
+typename bin_tree<T>::node *bin_tree<T>::node::clone(node *point)
+{
+    if (!point)
+    {
+        return nullptr;
+    }
+    node *new_node = new node(point->data);
+    new_node->height = point->height;
+    new_node->left = clone(point->left);
+    new_node->right = clone(point->right);
+    return new_node;
+}
+
+template <typename T>
 T &bin_tree<T>::node::get_data() const
 {
     return data;
@@ -143,13 +157,27 @@ typename bin_tree<T>::node &bin_tree<T>::node::operator=(const node &other)
 template <typename T>
 void bin_tree<T>::bin_iterator::build_in_order(node *point)
 {
-    if (!node)
+    if (!point)
     {
         return;
     }
-    buildInOrder(node->getLeft());
-    nodes.push_back(node);
-    buildInOrder(node->getRight());
+    std::stack<node *> st;
+    node *current = point;
+    while (current || !st.empty())
+    {
+        if (current)
+        {
+            st.push(current);
+            current = current->left;
+        }
+        else
+        {
+            current = st.top();
+            nodes.push_back(current);
+            st.pop();
+            current = current->right;
+        }
+    }
 }
 
 template <typename T>
@@ -310,3 +338,232 @@ bool bin_tree<T>::bin_iterator::operator!=(const bin_iterator &other) const
     }
     return recent != other.recent;
 }
+
+template <typename T>
+typename bin_tree<T>::bin_iterator bin_tree<T>::begin(std::string order)
+{
+    return bin_iterator(root, order);
+}
+
+template <typename T>
+typename bin_tree<T>::bin_iterator bin_tree<T>::end(std::string order)
+{
+    return bin_iterator(nullptr, order);
+}
+
+template <typename T>
+void bin_tree<T>::const_bin_iterator::build_in_order(const node *point)
+{
+    if (!point)
+    {
+        return;
+    }
+    std::stack<const node *> st;
+    const node *current = point;
+    while (current || !st.empty())
+    {
+        if (current)
+        {
+            st.push(current);
+            current = current->left;
+        }
+        else
+        {
+            current = st.top();
+            nodes.push_back(current);
+            st.pop();
+            current = current->right;
+        }
+    }
+}
+
+template <typename T>
+void bin_tree<T>::const_bin_iterator::build_pre_order(const node *point)
+{
+    if (!point)
+    {
+        return;
+    }
+    std::stack<const node *> st;
+    const node *current = point;
+    while (current || !st.empty())
+    {
+        nodes.push_back(current);
+        current = st.top();
+        st.pop();
+        if (current->right)
+        {
+            st.push(current->right);
+        }
+        if (current->left)
+        {
+            st.push(current->left);
+        }
+    }
+}
+
+template <typename T>
+void bin_tree<T>::const_bin_iterator::build_post_order(const node *point)
+{
+    if (!point)
+    {
+        return;
+    }
+    std::stack<const node *> st;
+    const node *current = point;
+    const node *last = nullptr;
+    while (current || !st.empty())
+    {
+        if (current)
+        {
+            st.push(current);
+            current = current->left;
+        }
+        else
+        {
+            const node *peek = st.top();
+            if (peek->right && last != peek->right)
+            {
+                current = peek->right;
+            }
+            else
+            {
+                nodes.push_back(peek);
+                last = peek;
+                st.pop();
+            }
+        }
+    }
+}
+
+template <typename T>
+bin_tree<T>::const_bin_iterator::const_bin_iterator(const node *root, std::string order) : recent(0)
+{
+    if (root)
+    {
+        if (order == "in_order")
+        {
+            build_in_order(root);
+        }
+        else if (order == "pre_order")
+        {
+            build_pre_order(root);
+        }
+        else if (order == "post_order")
+        {
+            build_post_order(root);
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid order");
+        }
+    }
+}
+
+template <typename T>
+const T &bin_tree<T>::const_bin_iterator::operator*() const
+{
+    if (nodes.empty() || recent >= nodes.size())
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    return nodes[recent]->get_data();
+}
+
+template <typename T>
+typename bin_tree<T>::const_bin_iterator &bin_tree<T>::const_bin_iterator::operator++()
+{
+    if (nodes.empty() || recent >= nodes.size())
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    recent++;
+    return *this;
+}
+
+template <typename T>
+typename bin_tree<T>::const_bin_iterator bin_tree<T>::const_bin_iterator::operator++(int)
+{
+    if (nodes.empty() || recent >= nodes.size())
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    const_bin_iterator temp = *this;
+    recent++;
+    return temp;
+}
+
+template <typename T>
+typename bin_tree<T>::const_bin_iterator &bin_tree<T>::const_bin_iterator::operator--()
+{
+    if (nodes.empty() || recent <= 0)
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    recent--;
+    return *this;
+}
+
+template <typename T>
+typename bin_tree<T>::const_bin_iterator bin_tree<T>::const_bin_iterator::operator--(int)
+{
+    if (nodes.empty() || recent <= 0)
+    {
+        throw std::out_of_range("Iterator out of range");
+    }
+    const_bin_iterator temp = *this;
+    recent--;
+    return temp;
+}
+
+template <typename T>
+bool bin_tree<T>::const_bin_iterator::operator==(const const_bin_iterator &other) const
+{
+    return recent == other.recent;
+}
+
+template <typename T>
+bool bin_tree<T>::const_bin_iterator::operator!=(const const_bin_iterator &other) const
+{
+    if (nodes.empty() || other.nodes.empty())
+    {
+        return true;
+    }
+    if (nodes.empty() && other.nodes.empty())
+    {
+        return false;
+    }
+    return recent != other.recent;
+}
+
+template <typename T>
+typename bin_tree<T>::const_bin_iterator bin_tree<T>::cbegin(std::string order) const
+{
+    return const_bin_iterator(root, order);
+}
+
+template <typename T>
+typename bin_tree<T>::const_bin_iterator bin_tree<T>::cend(std::string order) const
+{
+    return const_bin_iterator(nullptr, order);
+}
+
+template <typename T>
+bin_tree<T>::bin_tree() : root(nullptr) {}
+
+template <typename T>
+bin_tree<T>::bin_tree(const bin_tree<T> &other) : root(nullptr)
+{
+    if (other.root)
+    {
+        root = root->clone(other.root);
+    }
+}
+
+template <typename T>
+bin_tree<T>::~bin_tree()
+{
+    clear();
+}
+
+template <typename T>
