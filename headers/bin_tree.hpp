@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 template <typename T>
 class bin_tree
@@ -16,7 +17,7 @@ private:
         node();
         node(const T &value);
         ~node();
-        node *get_parent();
+        node *get_parent() const;
         node *get_left();
         node *get_right();
         node *clone(node *point);
@@ -45,9 +46,10 @@ public:
         void build_in_order(node *point);
         void build_pre_order(node *point);
         void build_post_order(node *point);
+        void build_level_order(node *point);
 
     public:
-        bin_iterator(node *root, std::string order = "in_order");
+        bin_iterator(node *root, std::string order = "level_order");
         T &operator*();
         bin_iterator &operator++();
         bin_iterator operator++(int);
@@ -65,9 +67,10 @@ public:
         void build_in_order(const node *point);
         void build_pre_order(const node *point);
         void build_post_order(const node *point);
+        void build_level_order(const node *point);
 
     public:
-        const_bin_iterator(const node *root, std::string order = "in_order");
+        const_bin_iterator(const node *root, std::string order = "level_order");
         const T &operator*() const;
         const_bin_iterator &operator++();
         const_bin_iterator operator++(int);
@@ -76,29 +79,40 @@ public:
         bool operator==(const const_bin_iterator &other) const;
         bool operator!=(const const_bin_iterator &other) const;
     };
-    bin_iterator begin(std::string order = "in_order");
-    bin_iterator end(std::string order = "in_order");
-    const_bin_iterator cbegin(std::string order = "in_order") const;
-    const_bin_iterator cend(std::string order = "in_order") const;
+    bin_iterator begin(std::string order = "level_order");
+    bin_iterator end(std::string order = "level_order");
+    const_bin_iterator cbegin(std::string order = "level_order") const;
+    const_bin_iterator cend(std::string order = "level_order") const;
     bin_tree();
     bin_tree(const bin_tree &other);
     ~bin_tree();
-    node *get_root() const;
+    node *get_root();
+    const node *get_root() const;
     node *find(const T &value);
+    const node *find(const T &value) const;
     node *find_min();
+    const node *find_min() const;
     node *find_max();
+    const node *find_max() const;
     node *get_parent(node *point);
-    void balance();
+    const node *get_parent(node *point) const;
     void clear();
+    bool is_empty() const;
     bool operator==(const bin_tree &other) const;
     bool operator!=(const bin_tree &other) const;
+    T reduce(std::function<T(T, T)> func, T init);
+    bin_tree &operator+(const bin_tree &other) const;
     bin_tree &operator=(const bin_tree &other);
     bin_tree *insert(const T &value);
     bin_tree *remove(const T &value);
+    bin_tree *get_subtree(const T &value) const;
     bin_tree *map(std::function<T(T)> func);
     bin_tree *where(std::function<bool(T)> func);
-    bin_tree *merge(const bin_tree &other);
-    bin_tree *immutable_merge(const bin_tree &other) const;
+    bin_tree *concat(const bin_tree &other);
+    bin_tree *immutable_insert(const T &value) const;
+    bin_tree *immutable_remove(const T &value) const;
+    bin_tree *immutable_map(std::function<T(T)> func) const;
+    bin_tree *immutable_concat(const bin_tree &other) const;
 };
 
 #include "../templates/bin_tree.tpp"

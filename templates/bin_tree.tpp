@@ -25,13 +25,13 @@ bin_tree<T>::node::~node()
 }
 
 template <typename T>
-typename bin_tree<T>::node *bin_tree<T>::node::get_parent()
+typename bin_tree<T>::node *bin_tree<T>::node::get_parent() const
 {
     if (!root)
     {
         return nullptr;
     }
-    node *current = root;
+    node *current = bin_tree()->get_root();
     node *parent = nullptr;
     while (current != this)
     {
@@ -45,6 +45,7 @@ typename bin_tree<T>::node *bin_tree<T>::node::get_parent()
             current = current->get_right();
         }
     }
+    return parent;
 }
 
 template <typename T>
@@ -240,6 +241,31 @@ void bin_tree<T>::bin_iterator::build_post_order(node *point)
 }
 
 template <typename T>
+void bin_tree<T>::bin_iterator::build_level_order(node *point)
+{
+    if (!point)
+    {
+        return;
+    }
+    std::queue<node *> q;
+    q.push(point);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        nodes.push_back(current);
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
 bin_tree<T>::bin_iterator::bin_iterator(node *root, std::string order) : recent(0)
 {
     if (root)
@@ -255,6 +281,10 @@ bin_tree<T>::bin_iterator::bin_iterator(node *root, std::string order) : recent(
         else if (order == "post_order")
         {
             build_post_order(root);
+        }
+        else if (order == "level_order")
+        {
+            build_level_order(root);
         }
         else
         {
@@ -437,6 +467,31 @@ void bin_tree<T>::const_bin_iterator::build_post_order(const node *point)
 }
 
 template <typename T>
+void bin_tree<T>::const_bin_iterator::build_level_order(const node *point)
+{
+    if (!point)
+    {
+        return;
+    }
+    std::queue<const node *> q;
+    q.push(point);
+    while (!q.empty())
+    {
+        const node *current = q.front();
+        q.pop();
+        nodes.push_back(current);
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
 bin_tree<T>::const_bin_iterator::const_bin_iterator(const node *root, std::string order) : recent(0)
 {
     if (root)
@@ -452,6 +507,10 @@ bin_tree<T>::const_bin_iterator::const_bin_iterator(const node *root, std::strin
         else if (order == "post_order")
         {
             build_post_order(root);
+        }
+        else if (order == "level_order")
+        {
+            build_level_order(root);
         }
         else
         {
@@ -567,3 +626,566 @@ bin_tree<T>::~bin_tree()
 }
 
 template <typename T>
+typename bin_tree<T>::node *bin_tree<T>::get_root()
+{
+    return root;
+}
+
+template <typename T>
+const typename bin_tree<T>::node *bin_tree<T>::get_root() const
+{
+    return root;
+}
+
+template <typename T>
+typename bin_tree<T>::node *bin_tree<T>::find(const T &value)
+{
+    if (!root)
+    {
+        return nullptr;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (current->get_data() == value)
+        {
+            return current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+const typename bin_tree<T>::node *bin_tree<T>::find(const T &value) const
+{
+    if (!root)
+    {
+        return nullptr;
+    }
+    std::queue<const node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        const node *current = q.front();
+        q.pop();
+        if (current->get_data() == value)
+        {
+            return current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+typename bin_tree<T>::node *bin_tree<T>::find_min()
+{
+    if (!root)
+    {
+        return nullptr;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    node *min = root;
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (current->get_data() < min->get_data())
+        {
+            min = current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+const typename bin_tree<T>::node *bin_tree<T>::find_min() const
+{
+    if (!root)
+    {
+        return nullptr;
+    }
+    std::queue<const node *> q;
+    q.push(root);
+    const node *min = root;
+    while (!q.empty())
+    {
+        const node *current = q.front();
+        q.pop();
+        if (current->get_data() < min->get_data())
+        {
+            min = current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+typename bin_tree<T>::node *bin_tree<T>::find_max()
+{
+    if (!root)
+    {
+        return nullptr;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    node *max = root;
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (current->get_data() > max->get_data())
+        {
+            max = current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+const typename bin_tree<T>::node *bin_tree<T>::find_max() const
+{
+    if (!root)
+    {
+        return nullptr;
+    }
+    std::queue<const node *> q;
+    q.push(root);
+    const node *max = root;
+    while (!q.empty())
+    {
+        const node *current = q.front();
+        q.pop();
+        if (current->get_data() > max->get_data())
+        {
+            max = current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+typename bin_tree<T>::node *bin_tree<T>::get_parent(node *point)
+{
+    if (!root || !point)
+    {
+        return nullptr;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (current->left == point || current->right == point)
+        {
+            return current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+const typename bin_tree<T>::node *bin_tree<T>::get_parent(node *point) const
+{
+    if (!root || !point)
+    {
+        return nullptr;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (current->left == point || current->right == point)
+        {
+            return current;
+        }
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+void bin_tree<T>::clear()
+{
+    if (!root)
+    {
+        return;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+        delete current;
+    }
+    root = nullptr;
+}
+
+template <typename T>
+bool bin_tree<T>::is_empty() const
+{
+    if (!root)
+    {
+        return true;
+    }
+    return false;
+}
+
+template <typename T>
+bool bin_tree<T>::operator==(const bin_tree<T> &other) const
+{
+    if (!root && !other.root)
+    {
+        return true;
+    }
+    if (!root || !other.root)
+    {
+        return false;
+    }
+    std::queue<node *> q1, q2;
+    q1.push(root);
+    q2.push(other.root);
+    while (!q1.empty() && !q2.empty())
+    {
+        node *current1 = q1.front();
+        q1.pop();
+        node *current2 = q2.front();
+        q2.pop();
+        if (current1->get_data() != current2->get_data())
+        {
+            return false;
+        }
+        if (current1->left && current2->left)
+        {
+            q1.push(current1->left);
+            q2.push(current2->left);
+        }
+        else if (current1->left || current2->left)
+        {
+            return false;
+        }
+        if (current1->right && current2->right)
+        {
+            q1.push(current1->right);
+            q2.push(current2->right);
+        }
+        else if (current1->right || current2->right)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+bool bin_tree<T>::operator!=(const bin_tree<T> &other) const
+{
+    return !(*this == other);
+}
+
+template <typename T>
+T bin_tree<T>::reduce(std::function<T(T, T)> func, T init)
+{
+    for (auto it = cbegin("level_order"); it != cend("level_order"); ++it)
+    {
+        init = func(init, *it);
+    }
+    return init;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree &bin_tree<T>::operator+(const bin_tree &other) const
+{
+    bin_tree<T> *result_tree = new bin_tree(*this);
+    result_tree->concat(other);
+    return *result_tree;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree &bin_tree<T>::operator=(const bin_tree<T> &other)
+{
+    if (this != &other)
+    {
+        clear();
+        if (other.root)
+        {
+            root = root->clone(other.root);
+        }
+    }
+    return *this;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::insert(const T &value)
+{
+    if (!root)
+    {
+        root = new node(value);
+        return;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        if (!current->left)
+        {
+            current->left = new node(value);
+            return;
+        }
+        else
+        {
+            q.push(current->left);
+        }
+        if (!current->right)
+        {
+            current->right = new node(value);
+            return;
+        }
+        else
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::remove(const T &value)
+{
+    node *to_remove = find(value);
+    if (!to_remove)
+    {
+        throw std::runtime_error("Value not found");
+    }
+    if (!root)
+    {
+        return;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    node *parent = nullptr;
+    node *current = nullptr;
+    while (!q.empty())
+    {
+        current = q.front();
+        q.pop();
+        if (current->left)
+        {
+            q.push(current->left);
+            parent = current;
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+            parent = current;
+        }
+    }
+    if (to_remove == current)
+    {
+        if (parent)
+        {
+            if (parent->get_left() == current)
+            {
+                parent->set_left(nullptr);
+            }
+            else
+            {
+                parent->get_right(nullptr);
+            }
+        }
+        else
+        {
+            root = nullptr;
+        }
+        delete current;
+        return;
+    }
+    to_remove->set_data(current->get_data());
+    if (parent)
+    {
+        if (parent->get_left() == current)
+        {
+            parent->set_left(nullptr);
+        }
+        else
+        {
+            parent->get_right(nullptr);
+        }
+    }
+    delete current;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::get_subtree(const T &value) const
+{
+    const node *subtree_root = find(value);
+    if (!subtree_root)
+    {
+        return nullptr;
+    }
+    bin_tree<T> *result = new bin_tree<T>();
+    subtree_root->clone(subtree_root);
+    return subtree_root;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::map(std::function<T(T)> func)
+{
+    if (!root)
+    {
+        return;
+    }
+    std::queue<node *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        node *current = q.front();
+        q.pop();
+        current->set_data(func(current->get_data()));
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::where(std::function<bool(T)> func)
+{
+    if (!root)
+    {
+        return;
+    }
+    bin_tree<T> *result = new bin_tree<T>();
+    for (auto it = cbegin(); it != cend(); ++it)
+    {
+        if (func(*it))
+        {
+            result->insert(*it);
+        }
+    }
+    return result;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::concat(const bin_tree &other)
+{
+    for (auto it = other.cbegin(); it != other.cend(); ++it)
+    {
+        insert(*it);
+    }
+    return this;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::immutable_insert(const T &value) const
+{
+    bin_tree<T> *result = new bin_tree<T>(*this);
+    result->insert(value);
+    return result;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::immutable_remove(const T &value) const
+{
+    bin_tree<T> *result = new bin_tree<T>(*this);
+    result->remove(value);
+    return result;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::immutable_map(std::function<T(T)> func) const
+{
+    bin_tree<T> *result = new bin_tree<T>();
+    for (auto it = cbegin(); it != cend(); ++it)
+    {
+        result->insert(func(*it));
+    }
+    return result;
+}
+
+template <typename T>
+typename bin_tree<T>::bin_tree *bin_tree<T>::immutable_concat(const bin_tree &other) const
+{
+    bin_tree<T> *result = new bin_tree<T>(*this);
+    for (auto it = other.cbegin(); it != other.cend(); ++it)
+    {
+        result->insert(*it);
+    }
+    return result;
+}
