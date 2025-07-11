@@ -1,10 +1,11 @@
 #pragma once
 #include <functional>
+#include <initializer_list>
 
 template <typename T>
 class bin_tree
 {
-private:
+public:
     class node
     {
     private:
@@ -17,11 +18,15 @@ private:
         node();
         node(const T &value);
         ~node();
-        node *get_parent() const;
+        node *get_parent(node *root) const;
         node *get_left();
+        const node *get_left() const;
         node *get_right();
-        node *clone(node *point);
-        T &get_data() const;
+        const node *get_right() const;
+        node *clone(const node *point);
+        const node *clone(const node *point) const;
+        T &get_data();
+        const T &get_data() const;
         int get_height();
         void set_left(node *left);
         void set_right(node *right);
@@ -34,6 +39,8 @@ private:
         bool operator>(const node &other) const;
         node &operator=(const node &other);
     };
+
+private:
     node *root;
 
 public:
@@ -50,6 +57,7 @@ public:
 
     public:
         bin_iterator(node *root, std::string order = "level_order");
+        void set_to_end();
         T &operator*();
         bin_iterator &operator++();
         bin_iterator operator++(int);
@@ -71,6 +79,7 @@ public:
 
     public:
         const_bin_iterator(const node *root, std::string order = "level_order");
+        void set_to_end();
         const T &operator*() const;
         const_bin_iterator &operator++();
         const_bin_iterator operator++(int);
@@ -84,6 +93,10 @@ public:
     const_bin_iterator cbegin(std::string order = "level_order") const;
     const_bin_iterator cend(std::string order = "level_order") const;
     bin_tree();
+    bin_tree(const node *root);
+    bin_tree(const int &size);
+    bin_tree(const T *data, const int &size);
+    bin_tree(const std::initializer_list<T> &list);
     bin_tree(const bin_tree &other);
     ~bin_tree();
     node *get_root();
