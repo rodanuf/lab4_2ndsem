@@ -1,4 +1,8 @@
 #pragma once
+#include <vector>
+#include <string>
+#include <queue>
+#include <stack>
 #include <functional>
 #include <initializer_list>
 

@@ -1,9 +1,4 @@
-#include <vector>
-#include <string>
-#include <queue>
-#include <stack>
 #include <stdexcept>
-#include <iostream>
 #include "../headers/bin_tree.hpp"
 
 template <typename T>
