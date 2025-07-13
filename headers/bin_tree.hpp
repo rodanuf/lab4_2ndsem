@@ -16,13 +16,15 @@ public:
         T data;
         node *left;
         node *right;
+        node *parent;
         int height;
 
     public:
         node();
         node(const T &value);
         ~node();
-        node *get_parent(node *root) const;
+        node *get_parent();
+        const node *get_parent() const;
         node *get_left();
         const node *get_left() const;
         node *get_right();
@@ -32,6 +34,7 @@ public:
         T &get_data();
         const T &get_data() const;
         int get_height();
+        void set_parent(node *parent);
         void set_left(node *left);
         void set_right(node *right);
         void set_data(const T &value);
@@ -114,6 +117,8 @@ public:
     node *get_parent(node *point);
     const node *get_parent(node *point) const;
     void clear();
+    void bubble_up(node *point);
+    void bubble_down(node *point);
     bool is_empty() const;
     bool operator==(const bin_tree &other) const;
     bool operator!=(const bin_tree &other) const;

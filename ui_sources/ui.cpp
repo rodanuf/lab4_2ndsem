@@ -142,7 +142,7 @@ void run_tree_menu(bin_tree<T> *tree)
             {
                 cout << "Choose element: ";
                 cin >> element;
-                cout << "Parent: " << tree->find(element)->get_parent(tree->get_root())->get_data() << endl;
+                cout << "Parent: " << tree->find(element)->get_parent()->get_data() << endl;
                 break;
             }
             case 5:
@@ -160,6 +160,7 @@ void run_tree_menu(bin_tree<T> *tree)
                 cin >> element;
                 tree = tree->insert(element);
                 cout << "Elemnt added." << endl;
+                std::cout << "Inserted: " << element << ", root = " << tree->get_root()->get_data() << std::endl;
                 break;
             }
             case 7:
@@ -222,14 +223,14 @@ void run_tree_menu(bin_tree<T> *tree)
             }
             case 12:
             {
-                cout << "Sequence: ";
+                cout << "Tree: ";
                 print_tree(tree);
                 cout << endl;
                 break;
             }
             case 13:
             {
-                cout << "Sequence: ";
+                cout << "Tree: ";
                 print_tree(tree);
                 cout << endl;
                 if (buffer_tree != nullptr)

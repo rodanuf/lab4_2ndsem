@@ -1,36 +1,25 @@
 #include <stdexcept>
 #include "../headers/bin_tree.hpp"
+#include <iostream>
 
 template <typename T>
-bin_tree<T>::node::node() : data(T()), left(nullptr), right(nullptr), height(0) {}
+bin_tree<T>::node::node() : data(T()), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
 
 template <typename T>
-bin_tree<T>::node::node(const T &value) : data(value), left(nullptr), right(nullptr), height(0) {}
+bin_tree<T>::node::node(const T &value) : data(value), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
 
 template <typename T>
 bin_tree<T>::node::~node() = default;
 
 template <typename T>
-typename bin_tree<T>::node *bin_tree<T>::node::get_parent(node *root) const
+typename bin_tree<T>::node *bin_tree<T>::node::get_parent()
 {
-    if (!root)
-    {
-        return nullptr;
-    }
-    node *current = root;
-    node *parent = nullptr;
-    while (current != this)
-    {
-        parent = current;
-        if (current->data > this->data)
-        {
-            current = current->get_left();
-        }
-        else
-        {
-            current = current->get_right();
-        }
-    }
+    return parent;
+}
+
+template <typename T>
+const typename bin_tree<T>::node *bin_tree<T>::node::get_parent() const
+{
     return parent;
 }
 
@@ -69,6 +58,7 @@ typename bin_tree<T>::node *bin_tree<T>::node::clone(const node *point)
     new_node->height = point->height;
     new_node->left = clone(point->left);
     new_node->right = clone(point->right);
+    new_node->parent = nullptr;
     return new_node;
 }
 
@@ -83,6 +73,7 @@ const typename bin_tree<T>::node *bin_tree<T>::node::clone(const node *point) co
     new_node->height = point->height;
     new_node->left = clone(point->left);
     new_node->right = clone(point->right);
+    new_node->parent = nullptr;
     return new_node;
 }
 
@@ -102,6 +93,12 @@ template <typename T>
 int bin_tree<T>::node::get_height()
 {
     return height;
+}
+
+template <typename T>
+void bin_tree<T>::node::set_parent(node *parent)
+{
+    this->parent = parent;
 }
 
 template <typename T>
@@ -178,6 +175,7 @@ typename bin_tree<T>::node &bin_tree<T>::node::operator=(const node &other)
     data = other.data;
     left = other.left;
     right = other.right;
+    parent = other.parent;
     return *this;
 }
 
@@ -800,26 +798,7 @@ typename bin_tree<T>::node *bin_tree<T>::find_min()
     {
         return nullptr;
     }
-    std::queue<node *> q;
-    q.push(root);
     node *min = root;
-    while (!q.empty())
-    {
-        node *current = q.front();
-        q.pop();
-        if (current->get_data() < min->get_data())
-        {
-            min = current;
-        }
-        if (current->get_left())
-        {
-            q.push(current->get_left());
-        }
-        if (current->get_right())
-        {
-            q.push(current->get_right());
-        }
-    }
     return min;
 }
 
@@ -830,26 +809,7 @@ const typename bin_tree<T>::node *bin_tree<T>::find_min() const
     {
         return nullptr;
     }
-    std::queue<const node *> q;
-    q.push(root);
     const node *min = root;
-    while (!q.empty())
-    {
-        const node *current = q.front();
-        q.pop();
-        if (current->get_data() < min->get_data())
-        {
-            min = current;
-        }
-        if (current->get_left())
-        {
-            q.push(current->get_left());
-        }
-        if (current->get_right())
-        {
-            q.push(current->get_right());
-        }
-    }
     return min;
 }
 
@@ -916,57 +876,13 @@ const typename bin_tree<T>::node *bin_tree<T>::find_max() const
 template <typename T>
 typename bin_tree<T>::node *bin_tree<T>::get_parent(node *point)
 {
-    if (!root || !point)
-    {
-        return nullptr;
-    }
-    std::queue<node *> q;
-    q.push(root);
-    while (!q.empty())
-    {
-        node *current = q.front();
-        q.pop();
-        if (current->get_left() == point || current->get_right() == point)
-        {
-            return current;
-        }
-        if (current->get_left())
-        {
-            q.push(current->get_left());
-        }
-        if (current->get_right())
-        {
-            q.push(current->get_right());
-        }
-    }
+    return point->get_parent();
 }
 
 template <typename T>
 const typename bin_tree<T>::node *bin_tree<T>::get_parent(node *point) const
 {
-    if (!root || !point)
-    {
-        return nullptr;
-    }
-    std::queue<node *> q;
-    q.push(root);
-    while (!q.empty())
-    {
-        node *current = q.front();
-        q.pop();
-        if (current->get_left() == point || current->get_right() == point)
-        {
-            return current;
-        }
-        if (current->get_left())
-        {
-            q.push(current->get_left());
-        }
-        if (current->get_right())
-        {
-            q.push(current->get_right());
-        }
-    }
+    return point->get_parent();
 }
 
 template <typename T>
@@ -993,6 +909,39 @@ void bin_tree<T>::clear()
         delete current;
     }
     root = nullptr;
+}
+
+template <typename T>
+void bin_tree<T>::bubble_up(node *point)
+{
+    while (point != root && *point < *(point->get_parent()))
+    {
+        std::swap(point->get_data(), point->get_parent()->get_data());
+        point = point->get_parent();
+    }
+}
+
+template <typename T>
+void bin_tree<T>::bubble_down(node *point)
+{
+    while (point && !point->is_leaf())
+    {
+        node *smallest = point;
+        if (point->get_left() && point->get_left()->get_data() < smallest->get_data())
+        {
+            smallest = point->get_left();
+        }
+        if (point->get_right() && point->get_right()->get_data() < smallest->get_data())
+        {
+            smallest = point->get_right();
+        }
+        if (smallest == point)
+        {
+            break;
+        }
+        std::swap(point->get_data(), smallest->get_data());
+        point = smallest;
+    }
 }
 
 template <typename T>
@@ -1097,6 +1046,7 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::insert(const T &value)
         root = new node(value);
         return this;
     }
+    node *new_node = new node(value);
     std::queue<node *> q;
     q.push(root);
     while (!q.empty())
@@ -1105,8 +1055,9 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::insert(const T &value)
         q.pop();
         if (!current->get_left())
         {
-            current->set_left(new node(value));
-            return this;
+            current->set_left(new_node);
+            new_node->set_parent(current);
+            break;
         }
         else
         {
@@ -1114,14 +1065,17 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::insert(const T &value)
         }
         if (!current->get_right())
         {
-            current->set_right(new node(value));
-            return this;
+            current->set_right(new_node);
+            new_node->set_parent(current);
+            break;
         }
         else
         {
             q.push(current->get_right());
         }
     }
+    bubble_up(new_node);
+    return this;
 }
 
 template <typename T>
@@ -1173,6 +1127,14 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::remove(const T &value)
             root = nullptr;
         }
         delete current;
+        if (to_remove->get_parent() && to_remove->get_data() < to_remove->get_parent()->get_data())
+        {
+            bubble_up(to_remove);
+        }
+        else
+        {
+            bubble_down(to_remove);
+        }
         return this;
     }
     to_remove->set_data(current->get_data());
@@ -1188,6 +1150,14 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::remove(const T &value)
         }
     }
     delete current;
+    if (to_remove->get_parent() && to_remove->get_data() < to_remove->get_parent()->get_data())
+    {
+        bubble_up(to_remove);
+    }
+    else
+    {
+        bubble_down(to_remove);
+    }
     return this;
 }
 

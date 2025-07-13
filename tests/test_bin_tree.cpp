@@ -23,7 +23,7 @@ TEST(test_bin_tree_node_functions, method_get_parent)
 {
     bin_tree<int> tree = {1, 2, 3, 4, 5};
     auto child = tree.find(3);
-    auto parent = child->get_parent(tree.get_root());
+    auto parent = child->get_parent();
     EXPECT_EQ(parent->get_data(), 1);
 }
 
