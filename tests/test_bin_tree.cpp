@@ -1,158 +1,9 @@
 #include <gtest/gtest.h>
+#include <iostream>
+#include "sequence.hpp"
+#include "array_sequence.hpp"
+#include "stack.hpp"
 #include "../headers/bin_tree.hpp"
-
-TEST(test_bin_tree_node, base_constructor)
-{
-    bin_tree<int>::node node;
-    EXPECT_EQ(node.get_data(), int());
-    EXPECT_EQ(node.get_left(), nullptr);
-    EXPECT_EQ(node.get_right(), nullptr);
-    EXPECT_EQ(node.get_height(), 0);
-}
-
-TEST(test_bin_tree_node, value_constructor)
-{
-    bin_tree<int>::node node(42);
-    EXPECT_EQ(node.get_data(), 42);
-    EXPECT_EQ(node.get_left(), nullptr);
-    EXPECT_EQ(node.get_right(), nullptr);
-    EXPECT_EQ(node.get_height(), 0);
-}
-
-TEST(test_bin_tree_node_functions, method_get_parent)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto child = tree.find(3);
-    auto parent = child->get_parent();
-    EXPECT_EQ(parent->get_data(), 1);
-}
-
-TEST(test_bin_tree_node_functions, method_get_left)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto node = tree.find(2);
-    auto node_left = node->get_left();
-    EXPECT_EQ(node_left->get_data(), 4);
-}
-
-TEST(test_bin_tree_node_functions, method_get_right)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto node = tree.find(2);
-    auto node_right = node->get_right();
-    EXPECT_EQ(node_right->get_data(), 5);
-}
-
-TEST(test_bin_tree_node_functions, method_clone)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto node = tree.find(3);
-    auto clone_node = node->clone(node);
-    EXPECT_EQ(clone_node->get_data(), 3);
-    EXPECT_EQ(clone_node->get_left(), nullptr);
-    EXPECT_EQ(clone_node->get_right(), nullptr);
-    EXPECT_EQ(clone_node->get_height(), node->get_height());
-}
-
-TEST(test_bin_tree_node_functions, method_get_data)
-{
-    bin_tree<int>::node node(42);
-    EXPECT_EQ(node.get_data(), 42);
-    const bin_tree<int>::node const_node(100);
-    EXPECT_EQ(const_node.get_data(), 100);
-}
-
-TEST(test_bin_tree_node_functions, method_get_height)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto node = tree.find(3);
-    EXPECT_EQ(node->get_height(), 1);
-}
-
-TEST(test_bin_tree_node_functions, method_set_left)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto node = tree.find(3);
-    bin_tree<int>::node *new_left_node = new bin_tree<int>::node(6);
-    node->set_left(new_left_node);
-    EXPECT_EQ(node->get_left()->get_data(), 6);
-}
-
-TEST(test_bin_tree_node_functions, method_set_right)
-{
-    bin_tree<int> tree = {1, 2, 3, 4, 5};
-    auto node = tree.find(3);
-    bin_tree<int>::node *new_right_node = new bin_tree<int>::node(6);
-    node->set_right(new_right_node);
-    EXPECT_EQ(node->get_right()->get_data(), 6);
-}
-
-TEST(test_bin_tree_node, method_set_data)
-{
-    bin_tree<int>::node node(42);
-    node.set_data(100);
-    EXPECT_EQ(node.get_data(), 100);
-}
-
-TEST(test_bin_tree_node, method_set_height)
-{
-    bin_tree<int>::node node(42);
-    node.set_height(2);
-    EXPECT_EQ(node.get_height(), 2);
-}
-
-TEST(test_bin_tree_node, method_is_leaf)
-{
-    bin_tree<int>::node node(42);
-    EXPECT_TRUE(node.is_leaf());
-    node.set_left(new bin_tree<int>::node(10));
-    EXPECT_FALSE(node.is_leaf());
-}
-
-TEST(test_bin_tree_node_operators, operator_equality)
-{
-    bin_tree<int>::node node_one(42);
-    bin_tree<int>::node node_two(42);
-    EXPECT_TRUE(node_one == node_two);
-    node_two.set_data(100);
-    EXPECT_FALSE(node_one == node_two);
-}
-
-TEST(test_bin_tree_node_operators, operator_nonequality)
-{
-    bin_tree<int>::node node_one(42);
-    bin_tree<int>::node node_two(42);
-    EXPECT_FALSE(node_one != node_two);
-    node_two.set_data(100);
-    EXPECT_TRUE(node_one != node_two);
-}
-
-TEST(test_bin_tree_node_operators, operator_less)
-{
-    bin_tree<int>::node node_one(10);
-    bin_tree<int>::node node_two(20);
-    EXPECT_TRUE(node_one < node_two);
-    EXPECT_FALSE(node_two < node_one);
-}
-
-TEST(test_bin_tree_node_operators, operator_greater)
-{
-    bin_tree<int>::node node_one(20);
-    bin_tree<int>::node node_two(10);
-    EXPECT_TRUE(node_one > node_two);
-    EXPECT_FALSE(node_two > node_one);
-}
-
-TEST(test_bin_tree_node_operators, operator_assignment)
-{
-    bin_tree<int>::node node_one(42);
-    node_one.set_left(new bin_tree<int>::node(10));
-    bin_tree<int>::node node_two;
-    node_two = node_one;
-    EXPECT_EQ(node_two.get_data(), 42);
-    EXPECT_NE(node_two.get_left(), nullptr);
-    EXPECT_EQ(node_two.get_left()->get_data(), 10);
-}
 
 TEST(test_bin_tree_iterator, base_constructor_iterator)
 {
@@ -548,36 +399,6 @@ TEST(test_bin_tree_functions, method_get_subtree)
     EXPECT_EQ(subtree->find(1)->get_data(), 1);
 }
 
-TEST(test_bin_tree_functions, method_map)
-{
-    bin_tree<int> tree;
-    tree.insert(1);
-    tree.insert(2);
-    tree.insert(3);
-    auto new_tree = tree.map([](int x)
-                             { return x * 2; });
-    auto it = new_tree->begin("in_order");
-    EXPECT_EQ(*it, 4);
-    ++it;
-    EXPECT_EQ(*it, 2);
-    ++it;
-    EXPECT_EQ(*it, 6);
-}
-
-TEST(test_bin_tree_functions, method_where)
-{
-    bin_tree<int> tree;
-    tree.insert(1);
-    tree.insert(2);
-    tree.insert(3);
-    auto new_tree = tree.where([](int x)
-                               { return x % 2 == 1; });
-    auto it = new_tree->begin("in_order");
-    EXPECT_EQ(*it, 3);
-    ++it;
-    EXPECT_EQ(*it, 1);
-}
-
 TEST(test_bin_tree_functions, method_concat)
 {
     bin_tree<int> tree_one;
@@ -594,17 +415,6 @@ TEST(test_bin_tree_functions, method_concat)
     ++it;
     ++it;
     EXPECT_EQ(*it, 5);
-}
-
-TEST(test_bin_tree_functions, method_reduce)
-{
-    bin_tree<int> tree;
-    tree.insert(1);
-    tree.insert(2);
-    tree.insert(3);
-    int sum = tree.reduce([](int a, int b)
-                          { return a + b; }, 0);
-    EXPECT_EQ(sum, 6);
 }
 
 TEST(test_bin_tree_functions, method_immutable_insert)

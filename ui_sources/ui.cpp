@@ -1,22 +1,8 @@
 #include "../ui_headers/ui.hpp"
+#include "../headers/bin_tree.hpp"
 #include "../ui_headers/io_functions.hpp"
 
 using namespace std;
-
-template <typename T>
-void print_tree(bin_tree<T> *container)
-{
-    cout << "[";
-    for (auto i = container->cbegin(); i != container->cend(); ++i)
-    {
-        if (i != container->cbegin())
-        {
-            cout << ", ";
-        }
-        cout << *i;
-    }
-    cout << "]" << endl;
-}
 
 void check_input(int &choice)
 {
@@ -223,20 +209,20 @@ void run_tree_menu(bin_tree<T> *tree)
             }
             case 12:
             {
-                cout << "Tree: ";
-                print_tree(tree);
+                cout << "Tree: " << std::endl;
+                print_tree(*tree, true, 0);
                 cout << endl;
                 break;
             }
             case 13:
             {
                 cout << "Tree: ";
-                print_tree(tree);
+                print_tree(*tree, true, 0);
                 cout << endl;
-                if (buffer_tree != nullptr)
+                if (*buffer_tree != nullptr)
                 {
                     cout << "Buffer tree: ";
-                    print_tree(buffer_tree);
+                    print_tree(*buffer_tree, true, 0);
                     cout << endl;
                 }
                 break;

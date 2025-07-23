@@ -3,8 +3,6 @@
 #include <memory>
 #include "../headers/bin_tree.hpp"
 
-template <typename T>
-void print_tree(bin_tree<T> *tree);
 void check_input(int &choice);
 void run_types_menu();
 template <typename T>
