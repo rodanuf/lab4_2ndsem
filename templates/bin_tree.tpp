@@ -1221,6 +1221,12 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::remove(const T &value)
         throw std::runtime_error("Value not found");
     }
     node *last = last_node;
+    if (!last)
+    {
+        delete root;
+        root = nullptr;
+        return this;
+    }
     if (to_remove == last)
     {
         node *parent = last->get_parent();
@@ -1234,6 +1240,10 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::remove(const T &value)
             {
                 parent->set_right(nullptr);
             }
+        }
+        else
+        {
+            root = nullptr;
         }
         delete last;
         last_node = find_last_node();
@@ -1253,6 +1263,7 @@ typename bin_tree<T>::bin_tree *bin_tree<T>::remove(const T &value)
         }
     }
     delete last;
+    last_node = find_last_node();
     if (to_remove->get_parent() && to_remove->get_data() < to_remove->get_parent()->get_data())
     {
         bubble_up(to_remove);

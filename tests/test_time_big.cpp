@@ -35,11 +35,10 @@ static void BM_Remove_Big(benchmark::State &state)
 {
     size_t n = state.range(0);
     auto data = generate_random_data_big(n);
-    bin_tree<int> tree;
-
     for (auto _ : state)
     {
         state.PauseTiming();
+        bin_tree<int> tree;
         for (int val : data)
             tree.insert(val);
         std::shuffle(data.begin(), data.end(), std::mt19937{42});
