@@ -1,6 +1,20 @@
 #include "../headers/bin_tree.hpp"
 
-using namespace std;
+inline void print_spaces(int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        std::cout << " ";
+    }
+}
+
+inline void print_lines(int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        std::cout << "|";
+    }
+}
 
 template <typename T>
 void print_tree(bin_tree<T> &tree, bool is_left, int vertical)
@@ -16,10 +30,10 @@ void print_tree_helper(typename bin_tree<T>::node *point, bool is_left, int vert
     {
         vertical++;
     }
-    cout << current->get_data();
+    std::cout << current->get_data();
     if (current->get_right())
     {
-        cout << "----";
+        std::cout << "----";
         print_tree_helper<T>(current->get_right(), false, vertical);
     }
     if (!is_left && current->get_left())
@@ -28,30 +42,34 @@ void print_tree_helper(typename bin_tree<T>::node *point, bool is_left, int vert
         bin_tree<T> *tree = new bin_tree<T>(current);
         for (int d = 0; d < tree->find_last_node()->get_height() - current->get_height(); d++)
         {
-            std::cout << "|";
+            print_lines();
             for (int i = 0; i < vertical; i++)
             {
-                std::cout << "    |";
+                print_spaces();
+                print_lines();
             }
             std::cout << std::endl;
         }
-        std::cout << "|";
+        print_lines();
         for (int i = 0; i < vertical - 1; i++)
         {
-            std::cout << "    |";
+            print_spaces();
+            print_lines();
         }
-        std::cout << "    ";
+        print_spaces();
         vertical--;
         delete tree;
         print_tree_helper<T>(current->get_left(), false, vertical);
     }
     if (is_left && current->get_left())
     {
-        cout << endl;
-        std::cout << "|" << endl;
-        std::cout << "|" << endl;
+        std::cout << std::endl;
+        print_lines();
+        std::cout << std::endl;
+        print_lines();
+        std::cout << std::endl;
         vertical = 0;
         print_tree_helper<T>(current->get_left(), true, vertical);
-        cout << endl;
+        std::cout << std::endl;
     }
 }

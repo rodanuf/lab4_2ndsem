@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 
+void print_spaces(int count = 4);
+void print_lines(int count = 1);
+
 template <typename T>
 void print_tree(bin_tree<T> &tree, bool is_left, int vertical);
 
